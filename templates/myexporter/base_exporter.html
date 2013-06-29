@@ -1,0 +1,41 @@
+{% extends 'staff_page.html' %}
+
+
+{% block title %}Data Exporter - {% endblock %}
+
+{% block header_files %}
+{% endblock %}
+
+{% block head_extra %}
+{% endblock %}
+
+{% block content %}
+
+    {% if form != None %}  
+        <form action="{{nav_loader.reverse}}" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <center><input type="submit" value="Submit" /></center>
+    {% endif %} 
+            {% block status_report %}
+
+            {% endblock %}
+            <hr>
+            <table width='100%' border='1'>
+                <tr>
+                    <td width='50%' valign='top'> 
+                        {% block left_side %}
+
+                        {% endblock %}
+                    </td>
+                    <td valign='top'>
+                        {% block right_side %}
+
+                        {% endblock %}
+                    </td>
+                </tr>
+            </table>
+    {% if form != None %}  
+        </form>
+    {% endif %} 
+
+{% endblock %}
+

@@ -55,20 +55,36 @@ def select_table_view(request):
 
     return render(request, 'myexporter/select_table.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
-        "tasks_nav": tasks_nav(request.user, 'data_loader'),
-        "steps_nav": steps_nav(request.user, 'file_upload'),
+        "tasks_nav": tasks_nav(request.user, 'data_exporter'),
+        "steps_nav": steps_nav(request.user, 'select_table'),
         "form": form,
     })
 
 
 def select_columns_view(request):
-    return HttpResponse("column select page")
+    return render(request, 'myexporter/select_columns.html', {
+        "main_nav": main_nav(request.user, 'staff_view'),
+        "tasks_nav": tasks_nav(request.user, 'data_exporter'),
+        "steps_nav": steps_nav(request.user, 'select_columns'),
+        #"form": form,
+    })
 
 def download_file_view(request):
-    return HttpResponse("download page")
+    return render(request, 'myexporter/download_file.html', {
+        "main_nav": main_nav(request.user, 'staff_view'),
+        "tasks_nav": tasks_nav(request.user, 'data_exporter'),
+        "steps_nav": steps_nav(request.user, 'download_file'),
+        #"form": form,
+    })
 
 def archive_view(request):
-    return HttpResponse("archive page")
+    return render(request, 'myexporter/archive.html', {
+        "main_nav": main_nav(request.user, 'staff_view'),
+        "tasks_nav": tasks_nav(request.user, 'data_exporter'),
+        "steps_nav": steps_nav(request.user, 'archive'),
+        #"form": form,
+    })
+
 
 
 

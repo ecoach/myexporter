@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     #url(r'^row_filter/', login_required(row_filter_view), name='row_filter'),
     url(r'^download_file/', login_required(download_file_view), name='download_file'),
     url(r'^archive/', login_required(archive_view), name='archive'),
-    url(r'^', login_required(archive_view), name='default'),
+    url(r'^', login_required(select_table_view), name='default'),
 
     # services
     #url(r'^download_analysis_db/', login_required(Download_Analysis_View), name='download_lite_db'),

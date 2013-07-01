@@ -1,16 +1,18 @@
 {% extends 'myexporter/base_exporter.html' %}
 
 {% block status_report %}
-
+status report: "table selected"
 {% endblock %}
 
 
 {% block left_side %}
-
+    table select
+    <br>
+    {{ form.select_datafile }}
 {% endblock %}
 
 
 {% block right_side %}
-
+info about table
 {% endblock %}
 

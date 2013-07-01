@@ -24,19 +24,8 @@ configure_source_data = myutils.configure_source_data
 
 def select_table_view(request):
 
-    profile = request.user.get_profile()
-    prefs = profile.prefs
+    download = task_object(request)
 
-    # pull the users stuff
-    try:
-        download = Download.objects.get(pk=prefs["download_pk"])
-    except:  
-        download = Download(user=request.user)
-        download.save()
-        prefs['download_pk'] = download.id
-        profile.prefs = prefs
-        profile.save()
- 
     # handle form (if submitted)
     if request.method == 'POST':
         form = Select_Table_Form(
@@ -51,6 +40,7 @@ def select_table_view(request):
         #  
         form = Select_Table_Form(
             request=request,
+            #initial={'select_datafile' : df, 'select_idmap': mf}
         )
 
     return render(request, 'myexporter/select_table.html', {
@@ -62,29 +52,97 @@ def select_table_view(request):
 
 
 def select_columns_view(request):
+
+    download = task_object(request)
+
+    # handle form (if submitted)
+    if request.method == 'POST':
+        form = Select_Table_Form(
+            request=request,
+            data=request.POST, 
+        )
+        if form.is_valid():
+            # Do valid form stuff here
+            form.save_data(download)
+            return redirect('myexporter:select_table')
+    else:
+        form = Select_Table_Form(
+            request=request,
+        )
+
     return render(request, 'myexporter/select_columns.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'select_columns'),
-        #"form": form,
+        "form": form,
     })
 
 def download_file_view(request):
+
+    download = task_object(request)
+
+    # handle form (if submitted)
+    if request.method == 'POST':
+        form = Select_Table_Form(
+            request=request,
+            data=request.POST, 
+        )
+        if form.is_valid():
+            # Do valid form stuff here
+            form.save_data(download)
+            return redirect('myexporter:select_table')
+    else:
+        form = Select_Table_Form(
+            request=request,
+        )
+
     return render(request, 'myexporter/download_file.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'download_file'),
-        #"form": form,
+        "form": form,
     })
 
 def archive_view(request):
+
+    download = task_object(request)
+
+    # handle form (if submitted)
+    if request.method == 'POST':
+        form = Select_Table_Form(
+            request=request,
+            data=request.POST, 
+        )
+        if form.is_valid():
+            # Do valid form stuff here
+            form.save_data(download)
+            return redirect('myexporter:select_table')
+    else:
+        form = Select_Table_Form(
+            request=request,
+        )
+
     return render(request, 'myexporter/archive.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'archive'),
-        #"form": form,
+        "form": form,
     })
 
+def task_object(request):
 
+    profile = request.user.get_profile()
+    prefs = profile.prefs
 
+    # pull the users stuff
+    try:
+        download = Download.objects.get(pk=prefs["download_pk"])
+    except:  
+        download = Download(user=request.user)
+        download.save()
+        prefs['download_pk'] = download.id
+        profile.prefs = prefs
+        profile.save()
+ 
+    return download
 

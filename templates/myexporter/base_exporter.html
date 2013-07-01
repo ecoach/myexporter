@@ -12,7 +12,7 @@
 {% block content %}
 
     {% if form != None %}  
-        <form action="{{nav_loader.reverse}}" method="post" enctype="multipart/form-data">{% csrf_token %}
+        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
             <center><input type="submit" value="Submit" /></center>
     {% endif %} 
             {% block status_report %}

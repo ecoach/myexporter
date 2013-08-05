@@ -65,6 +65,7 @@ def select_columns_view(request):
     # handle form (if submitted)
     if request.method == 'POST':
         form = Select_Columns_Form(
+            #column_choices = Download_Column.column_choices(download.id),
             column_choices = download.column_choices(),
             data=request.POST, 
         )
@@ -81,10 +82,11 @@ def select_columns_view(request):
             #return redirect('myexporter:select_table')
     else:
         form = Select_Columns_Form(
+            #column_choices = Download_Column.column_choices(download.id),
             column_choices = download.column_choices(),
             initial={
                 'seperator' : download.myseperator(),
-                'columns' : Download_Column.objects.all().filter(download=download.id).values_list('column_name')
+                'columns' : Download_Column.column_choices(download.id)
             }
         )
 
@@ -93,6 +95,7 @@ def select_columns_view(request):
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'select_columns'),
         "active_seperator": download.myseperator(),
+        "active_columns": download.mycolumns(),
         "form": form,
     })
 
@@ -103,7 +106,6 @@ def download_file_view(request):
     # handle form (if submitted)
     if request.method == 'POST':
         form = Download_File_Form(
-            request=request,
             data=request.POST, 
         )
         if form.is_valid():
@@ -112,7 +114,10 @@ def download_file_view(request):
             return redirect('myexporter:select_table')
     else:
         form = Download_File_Form(
-            request=request,
+            initial={
+                'seperator' : download.myseperator(),
+                'columns' : Download_Column.column_choices(download.id)
+            }
         )
 
     return render(request, 'myexporter/download_file.html', {
@@ -163,6 +168,9 @@ def task_object(request):
         prefs['download_pk'] = download.id
         profile.prefs = prefs
         profile.save()
+
+    # dig path out of settings
+    Download_File.populate('/path/to/files') # called way more often than necessary too!
 
     return download
 

@@ -1,5 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.importlib import import_module
+from django.conf import settings
+from mylogger.models import ELog
+mydata = import_module(settings.MYDATA)
+Source1 = mydata.models.Source1
 
 # Create your models here.
 
@@ -19,7 +24,7 @@ class Download_Table(models.Model):
     def populate(self):
         # These should be models available
         available = [
-            ['Event Log', 'Elog'],
+            ['Event Log', 'ELog'],
             ['MTS Source', 'Source1']
         ]
         # If models not found, create them 
@@ -28,6 +33,31 @@ class Download_Table(models.Model):
             if len(on_file) < 1:
                 dd = Download_Table(table_name=aa[0], model_name=aa[1])
                 dd.save()
+
+class Download_File(models.Model):
+    # [12m Download_Table__Download]
+    path = models.CharField(max_length=200)
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        #return str(self.id) + '_' + self.table_name
+        return str(self.id) + self.name
+
+    def disk_name(self):
+        return self.__unicode__()
+
+    @classmethod
+    def populate(self, path):
+        # Look on disk to find all csv files at path
+        return
+        available = [['path'], ['name']]
+        # If models not found, create them 
+        for aa in available:
+            on_file = Download_File.objects.filter(path=aa[0], name=aa[1]) 
+            if len(on_file) < 1:
+                dd = Download_Table(table_name=aa[0], model_name=aa[1])
+                dd.save()
+
 
 class Download(models.Model):
     user = models.ForeignKey(User, to_field='username') 
@@ -55,12 +85,33 @@ class Download(models.Model):
         else:
             return ''
 
+    def mycolumns(self):
+        cols = Download_Column.column_choices(self.id)
+        if len(cols) > 0: 
+            return map(str, cols)
+        else:
+            return ''
+
     def column_choices(self):
-        return zip([1,2,4], ['hi', 'there', 'yo'])
+        ids = []
+        for ff in eval(self.table.model_name)._meta.fields:
+            ids.append(ff.name)
+        return zip(ids, ids)
+        #return zip([1,2], ['hi', 'yo'])
 
 class Download_Column(models.Model):
     column_name = models.CharField(max_length=100)
     download = models.ForeignKey(Download)
+
+    @classmethod
+    def column_choices(self, download_id):
+        #return [1]
+        try:
+            cols = Download_Column.objects.all().filter(download=download_id).values_list('column_name')
+            return [x[0] for x in cols]
+        except:
+            return []
+
 
 """
 def table_choices(self):

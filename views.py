@@ -25,28 +25,33 @@ configure_source_data = myutils.configure_source_data
 def select_table_view(request):
 
     download = task_object(request)
-
     # handle form (if submitted)
     if request.method == 'POST':
         form = Select_Table_Form(
-            request=request,
             data=request.POST, 
+            #db_table_choices=download.table_choices(),
         )
         if form.is_valid():
+            download.table = form.cleaned_data['db_table']
+            download.save()
             # Do valid form stuff here
-            form.save_data(download)
-            return redirect('myexporter:select_table')
+            #return redirect('myexporter:select_table')
     else:
         #  
         form = Select_Table_Form(
-            request=request,
-            #initial={'select_datafile' : df, 'select_idmap': mf}
+            #db_table_choices=download.table_choices(),
+            initial={
+                # request.user.get_pref('sample_name')
+                #'db_table' : download.table_choice('pref#')
+                'db_table' : download.mytable_id()
+            }
         )
 
     return render(request, 'myexporter/select_table.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'select_table'),
+        "active_download_table": download.mytable_name(),
         "form": form,
     })
 
@@ -54,26 +59,40 @@ def select_table_view(request):
 def select_columns_view(request):
 
     download = task_object(request)
+    if download.table is None:
+        return redirect('myexporter:select_table') 
 
     # handle form (if submitted)
     if request.method == 'POST':
-        form = Select_Table_Form(
-            request=request,
+        form = Select_Columns_Form(
+            column_choices = download.column_choices(),
             data=request.POST, 
         )
         if form.is_valid():
             # Do valid form stuff here
-            form.save_data(download)
-            return redirect('myexporter:select_table')
+            if form.cleaned_data["columns"] != None:  
+                cols = form.cleaned_data["columns"]
+                Download_Column.objects.all().filter(download=download).delete()
+                for cc in cols:
+                    Download_Column(download=download, column_name=cc).save()
+            if form.cleaned_data["seperator"] != None:
+                download.seperator = form.cleaned_data['seperator']
+                download.save()
+            #return redirect('myexporter:select_table')
     else:
-        form = Select_Table_Form(
-            request=request,
+        form = Select_Columns_Form(
+            column_choices = download.column_choices(),
+            initial={
+                'seperator' : download.myseperator(),
+                'columns' : Download_Column.objects.all().filter(download=download.id).values_list('column_name')
+            }
         )
 
     return render(request, 'myexporter/select_columns.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'select_columns'),
+        "active_seperator": download.myseperator(),
         "form": form,
     })
 
@@ -83,7 +102,7 @@ def download_file_view(request):
 
     # handle form (if submitted)
     if request.method == 'POST':
-        form = Select_Table_Form(
+        form = Download_File_Form(
             request=request,
             data=request.POST, 
         )
@@ -92,7 +111,7 @@ def download_file_view(request):
             form.save_data(download)
             return redirect('myexporter:select_table')
     else:
-        form = Select_Table_Form(
+        form = Download_File_Form(
             request=request,
         )
 
@@ -109,7 +128,7 @@ def archive_view(request):
 
     # handle form (if submitted)
     if request.method == 'POST':
-        form = Select_Table_Form(
+        form = Archive_Form(
             request=request,
             data=request.POST, 
         )
@@ -118,7 +137,7 @@ def archive_view(request):
             form.save_data(download)
             return redirect('myexporter:select_table')
     else:
-        form = Select_Table_Form(
+        form = Archive_Form(
             request=request,
         )
 
@@ -131,6 +150,7 @@ def archive_view(request):
 
 def task_object(request):
 
+    Download_Table.populate() # called way more often than necessary...
     profile = request.user.get_profile()
     prefs = profile.prefs
 
@@ -143,6 +163,6 @@ def task_object(request):
         prefs['download_pk'] = download.id
         profile.prefs = prefs
         profile.save()
- 
+
     return download
 

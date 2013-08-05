@@ -1,12 +1,14 @@
 {% extends 'myexporter/base_exporter.html' %}
 
 {% block status_report %}
-
+Seperator: {{active_seperator}}
 {% endblock %}
 
 
 {% block left_side %}
-
+    {{ form.seperator }}
+    <br>
+    {{ form.columns }}
 {% endblock %}
 
 

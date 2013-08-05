@@ -1,18 +1,25 @@
 {% extends 'myexporter/base_exporter.html' %}
 
 {% block status_report %}
-status report: "table selected"
+Database Table: {{active_download_table}}
 {% endblock %}
 
 
 {% block left_side %}
-    table select
-    <br>
-    {{ form.select_datafile }}
+    <table>
+        <tr>
+            <td>
+                Database Table:
+            </td>
+            <td>
+                {{ form.db_table }}
+            </td>
+        </tr>
+    </table>
 {% endblock %}
 
 
 {% block right_side %}
-info about table
+
 {% endblock %}
 

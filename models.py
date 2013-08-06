@@ -34,38 +34,16 @@ class Download_Table(models.Model):
                 dd = Download_Table(table_name=aa[0], model_name=aa[1])
                 dd.save()
 
-class Download_File(models.Model):
-    # [12m Download_Table__Download]
-    path = models.CharField(max_length=200)
-    name = models.CharField(max_length=100)
-
-    def __unicode__(self):
-        #return str(self.id) + '_' + self.table_name
-        return str(self.id) + self.name
-
-    def disk_name(self):
-        return self.__unicode__()
-
-    @classmethod
-    def populate(self, path):
-        # Look on disk to find all csv files at path
-        return
-        available = [['path'], ['name']]
-        # If models not found, create them 
-        for aa in available:
-            on_file = Download_File.objects.filter(path=aa[0], name=aa[1]) 
-            if len(on_file) < 1:
-                dd = Download_Table(table_name=aa[0], model_name=aa[1])
-                dd.save()
-
-
 class Download(models.Model):
     user = models.ForeignKey(User, to_field='username') 
     table = models.ForeignKey(Download_Table, null=True) 
     # [12m Download__Download_Column]
     seperator = models.CharField(max_length=10, null=True)
-    file_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now=False,blank=True, null=True)
+
+    def myname(self):
+        return 'yo'
 
     def mytable_id(self):
         if not self.table is None:

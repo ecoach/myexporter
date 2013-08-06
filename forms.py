@@ -22,8 +22,8 @@ class Select_Columns_Form(forms.Form):
         self.fields['columns'].choices = column_choices
 
 class Download_File_Form(forms.Form):
-    db_table = forms.ModelChoiceField(required=False, queryset=Download_Table.objects.all().order_by('id'))
-    pass
+    download_name = forms.CharField(required=False)
 
 class Archive_Form(forms.Form):
+     #= forms.ModelChoiceField(required=False, queryset=Download_Table.objects.all().order_by('id'))
     pass

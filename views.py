@@ -99,7 +99,7 @@ def select_columns_view(request):
         "form": form,
     })
 
-def download_file_view(request):
+def download_trigger_view(request):
 
     download = task_object(request)
 
@@ -108,15 +108,15 @@ def download_file_view(request):
         form = Download_File_Form(
             data=request.POST, 
         )
-        if form.is_valid():
+        if form.is_valid() and len(form.cleaned_data['download_name']) > 0:
             # Do valid form stuff here
-            form.save_data(download)
-            return redirect('myexporter:select_table')
+            download.name = form.cleaned_data['download_name']
+            download.save()
+            return redirect('myexporter:download_file')
     else:
         form = Download_File_Form(
             initial={
-                'seperator' : download.myseperator(),
-                'columns' : Download_Column.column_choices(download.id)
+                'download_name' : download.myname(),
             }
         )
 
@@ -124,8 +124,35 @@ def download_file_view(request):
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'download_file'),
+        "active_name": download.myname(),
         "form": form,
     })
+
+def download_file_view(request):
+    import os, time
+
+    return redirect('myexporter:select_table')
+    # if not admin don't do it
+    staffmember = request.user.is_staff
+    if not staffmember:
+        return redirect('myexporter:select_table')
+
+    # send the results
+    try:
+        now = time.strftime('%Y-%m-%d-%H-%M-%S')         
+        file_name = "mydb_" + now + ".sql"
+        file_path = settings.DIR_COACH + "uploads/backups/" + file_name
+        
+        os.system("mysqldump -u ecoach -pecoach " + settings.DB_NAME + " > " + file_path)
+
+        fsock = open(file_path,"rb")
+        response = HttpResponse(fsock, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=' + file_name            
+    except IOError:
+        response = HttpResponseNotFound("error creating backup database file")
+
+    return response
+
 
 def archive_view(request):
 
@@ -170,7 +197,7 @@ def task_object(request):
         profile.save()
 
     # dig path out of settings
-    Download_File.populate('/path/to/files') # called way more often than necessary too!
+    #Download_File.populate('/path/to/files') # called way more often than necessary too!
 
     return download
 

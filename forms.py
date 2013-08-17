@@ -7,15 +7,23 @@ from django.utils.importlib import import_module
 #Source1 = mydata.models.Source1
 
 class Select_Table_Form(forms.Form):
-    db_table = forms.ModelChoiceField(required=False, queryset=Download_Table.objects.all().order_by('id'))
+    db_table = forms.ChoiceField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(Select_Table_Form, self).__init__(*args, **kwargs)
-        #self.fields['db_table'].choices = db_table_choices
+        self.fields['db_table'].choices = self.table_choices()
+
+    def table_choices(self):
+        available = [
+            ('ELog', 'ELog'),
+            ('Source1', 'Source1'),
+            ('Common1', 'Common1')
+        ]
+        return available
 
 class Select_Columns_Form(forms.Form):
     columns = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple)
-    seperator = forms.CharField(required=False)
+    seperator = forms.CharField(required=False, max_length=1)
 
     def __init__(self, column_choices, *args, **kwargs):
         super(Select_Columns_Form, self).__init__(*args, **kwargs)
@@ -25,5 +33,7 @@ class Download_File_Form(forms.Form):
     download_name = forms.CharField(required=False)
 
 class Archive_Form(forms.Form):
-     #= forms.ModelChoiceField(required=False, queryset=Download_Table.objects.all().order_by('id'))
-    pass
+    download = forms.ModelChoiceField(required=False, queryset=Download.objects.all().order_by('id'))
+
+    #def __init__(self, *args, **kwargs):
+        #super(Select_Table_Form, self).__init__(*args, **kwargs)

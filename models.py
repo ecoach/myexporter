@@ -5,57 +5,28 @@ from django.conf import settings
 from mylogger.models import ELog
 mydata = import_module(settings.MYDATA)
 Source1 = mydata.models.Source1
+Common1 = mydata.models.Common1
 
 # Create your models here.
 
-class Download_Table(models.Model):
-    # [12m Download_Table__Download]
-    table_name = models.CharField(max_length=100)
-    model_name = models.CharField(max_length=100)
-
-    def __unicode__(self):
-        #return str(self.id) + '_' + self.table_name
-        return self.table_name
-
-    def disk_name(self):
-        return self.__unicode__()
-
-    @classmethod
-    def populate(self):
-        # These should be models available
-        available = [
-            ['Event Log', 'ELog'],
-            ['MTS Source', 'Source1']
-        ]
-        # If models not found, create them 
-        for aa in available:
-            on_file = Download_Table.objects.filter(table_name=aa[0], model_name=aa[1]) 
-            if len(on_file) < 1:
-                dd = Download_Table(table_name=aa[0], model_name=aa[1])
-                dd.save()
-
 class Download(models.Model):
     user = models.ForeignKey(User, to_field='username') 
-    table = models.ForeignKey(Download_Table, null=True) 
+    table = models.CharField(max_length=30, null=True)
     # [12m Download__Download_Column]
-    seperator = models.CharField(max_length=10, null=True)
+    seperator = models.CharField(max_length=10, null=True, default=',')
     name = models.CharField(max_length=100)
+    file_name = models.CharField(max_length=100)
+    downloaded = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now=False,blank=True, null=True)
 
-    def myname(self):
-        return 'yo'
+    def __unicode__(self):
+        return str(self.id) + '_' + self.name
 
-    def mytable_id(self):
-        if not self.table is None:
-            return self.table.id
-        else:
-            return 1
+    def get_name(self):
+        return self.__unicode__()
 
-    def mytable_name(self):
-        if not self.table is None:
-            return self.table.table_name
-        else:
-            return ''
+    def diskname(self):
+        return str(self.id) + '_' + self.name
 
     def myseperator(self):
         if not self.seperator is None:
@@ -63,45 +34,15 @@ class Download(models.Model):
         else:
             return ''
 
-    def mycolumns(self):
-        cols = Download_Column.column_choices(self.id)
-        if len(cols) > 0: 
-            return map(str, cols)
-        else:
-            return ''
-
     def column_choices(self):
         ids = []
-        for ff in eval(self.table.model_name)._meta.fields:
+        for ff in eval(self.table)._meta.fields:
             ids.append(ff.name)
         return zip(ids, ids)
-        #return zip([1,2], ['hi', 'yo'])
 
 class Download_Column(models.Model):
     column_name = models.CharField(max_length=100)
     download = models.ForeignKey(Download)
 
-    @classmethod
-    def column_choices(self, download_id):
-        #return [1]
-        try:
-            cols = Download_Column.objects.all().filter(download=download_id).values_list('column_name')
-            return [x[0] for x in cols]
-        except:
-            return []
-
-
-"""
-def table_choices(self):
-    db_table_choices = [('1', 'table1'), ('2', 'table2')]
-    return db_table_choices
-
-def table_choice(self, pref):
-    table_selection = 1
-    for cc in self.table_choices():
-        if cc[1] == pref:
-            table_selection = cc[0]
-    return table_selection
-"""
 
 

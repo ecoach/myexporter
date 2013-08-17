@@ -16,7 +16,7 @@ urlpatterns = patterns('',
     url(r'^select_columns/', login_required(select_columns_view), name='select_columns'),
     #url(r'^row_filter/', login_required(row_filter_view), name='row_filter'),
     url(r'^download_trigger/', login_required(download_trigger_view), name='download_trigger'),
-    url(r'^download_file/', login_required(download_file_view), name='download_file'),
+    url(r'^download_file/(?P<download_id>.*)$', login_required(download_file_view), name='download_file'),
     url(r'^archive/', login_required(archive_view), name='archive'),
     url(r'^', login_required(select_table_view), name='default'),
 

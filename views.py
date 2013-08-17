@@ -72,11 +72,14 @@ def select_columns_view(request):
                     Download_Column(download=download, column_name=cc).save()
             if form.cleaned_data["seperator"] != None:
                 download.seperator = form.cleaned_data['seperator']
-                download.save()
+            if form.cleaned_data["download_name"] != None:
+                download.name = form.cleaned_data['download_name']
+            download.save()
     else:
         form = Select_Columns_Form(
             column_choices = download.column_choices(),
             initial={
+                'download_name' : download.name,
                 'seperator' : download.myseperator(),
                 'columns' : [ii.column_name for ii in download.download_column_set.all()]
             }
@@ -86,6 +89,7 @@ def select_columns_view(request):
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'select_columns'),
+        "active_name": download.name,
         "active_seperator": download.myseperator(),
         "active_columns": [str(ii.column_name) for ii in download.download_column_set.all()],
         "form": form,
@@ -103,26 +107,32 @@ def download_trigger_view(request):
         )
         if form.is_valid():
             # Do valid form stuff here
-            download.name = form.cleaned_data['download_name']
             download.created = datetime.now()
             download.file_name = download.diskname() + ".csv"
             download.downloaded = False
             download.save()
             # create the file
             cols = [ii.column_name for ii in download.download_column_set.all()]
-            res = eval(download.table).objects.values_list(*cols)
+            table = []
+            res = eval(download.table).objects.all()
+            for rr in res:
+                data = []
+                for cc in cols:
+                    data.append(getattr(rr, cc))
+                table.append(data)
             # write the file
             file_path = settings.DIR_DOWNLOAD_DATA + "exports/" + download.file_name
             with open(file_path, 'wb') as csvfile:
                 csvwriter = csv.writer(csvfile, delimiter=str(download.seperator), quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                for ii in res:
+                csvwriter.writerow(cols)
+                for ii in table:
                     csvwriter.writerow(ii)
             # redirect to archive which redirects download the first time
+            new_task(request.user) 
             return redirect('myexporter:archive')
     else:
         form = Download_File_Form(
             initial={
-                'download_name' : download.name,
             }
         )
     return render(request, 'myexporter/download_file.html', {
@@ -136,9 +146,10 @@ def download_trigger_view(request):
 def archive_view(request):
     # auto download once, if fail then set to downloaded and redirect back
     download = task_object(request.user)
-    if not download.downloaded:
-        return redirect('myexporter:download_file')
-        
+    downloads = Download.objects.all().exclude(id=download.id).order_by('-id')
+    archive_list = []
+    for dd in downloads:
+        archive_list.append([dd.diskname, dd.id])
     # handle form (if submitted)
     if request.method == 'POST':
         form = Archive_Form(
@@ -165,27 +176,26 @@ def archive_view(request):
         "main_nav": main_nav(request.user, 'staff_view'),
         "tasks_nav": tasks_nav(request.user, 'data_exporter'),
         "steps_nav": steps_nav(request.user, 'archive'),
+        "active_download": download.diskname(),
+        "archive_list": archive_list,
         "form": form,
     })
 
-def download_file_view(request):
+def download_file_view(request, **kwargs):
     # if not admin don't do it
-    download = task_object(request.user)
     staffmember = request.user.is_staff
     if not staffmember:
         return redirect('myexporter:download_trigger')
+    if kwargs['download_id'] != '':
+        download_id = kwargs['download_id']
     try:        
+        download = Download.objects.get(id=download_id)
         file_path = settings.DIR_DOWNLOAD_DATA + "exports/" + download.file_name
         fsock = open(file_path,"rb")
         response = HttpResponse(fsock, content_type='application/octet-stream')
         response['Content-Disposition'] = 'attachment; filename=' + download.file_name            
-        download.downloaded = True
-        download.save() 
-        new_task(request.user) 
     except IOError:
         #response = HttpResponseNotFound("error downloading csv file")
-        download.downloaded=True
-        download.save()
         return redirect('myexporter:archive')
 
     # send the results

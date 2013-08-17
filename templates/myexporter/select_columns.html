@@ -1,16 +1,53 @@
 {% extends 'myexporter/base_exporter.html' %}
 
 {% block status_report %}
+Download Name: {{active_name}}
+<br>
 Seperator: {{active_seperator}}
 <br>
-Columns: {{active_columns}}
+Num Columns Selected: {{active_columns|length}}
 {% endblock %}
 
 
 {% block left_side %}
-    Seperator: {{ form.seperator }}
-    <br>
-    Columns: {{ form.columns }}
+
+    <script type="text/javascript">
+        function toggle_check(checked)
+        {
+            jQuery("[id^='id_columns']").prop('checked', checked);
+        }
+    </script>
+    <table>
+        <tr>
+            <td valign='top'>
+                Download Name: 
+            </td>
+            <td>
+                {{ form.download_name }}
+            <td>
+        </tr>
+        <tr>
+            <td valign='top'>
+                Seperator: 
+            </td>
+            <td>
+                {{ form.seperator }}
+            </td>
+        </tr>
+        <tr>
+            <td valign='top'>
+                Columns:<br>
+            </td>
+            <td>
+                <nobr>
+                    <input type="checkbox" onclick="toggle_check(this.checked);" /> 
+                    toggle checkall
+                </nobr>
+                <hr>
+                {{ form.columns }}
+            <td>
+        </tr>
+    </table>
 {% endblock %}
 
 

@@ -1,15 +1,27 @@
 {% extends 'myexporter/base_exporter.html' %}
 
 {% block status_report %}
-
+Active Download: {{active_download}}
 {% endblock %}
 
 
 {% block left_side %}
-    {{ form.as_p }}
+    Archived Downloads: {{ form.download }}
 {% endblock %}
 
 
 {% block right_side %}
-
+    <table>
+        <tr>
+            <td valign='top'>
+                File Links:
+            </td>
+            <td>
+                {% for val in archive_list %}
+                    <a href="{% url 'myexporter:download_file' download_id=val.1 %}">{{val.0}}.csv</a> 
+                    <br>
+                {% endfor %}
+            </td>
+    </table>
+        <tr>
 {% endblock %}

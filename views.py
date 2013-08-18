@@ -225,3 +225,34 @@ def new_task(user):
     profile.prefs = prefs
     profile.save()
 
+def dump_sql_view(request):
+    return render(request, 'myexporter/mysql.html', {
+        "main_nav": main_nav(request.user, 'staff_view'),
+        "tasks_nav": tasks_nav(request.user, 'data_exporter'),
+        "steps_nav": steps_nav(request.user, 'dump_sql'),
+    })
+
+def Download_Mysql_View(request):
+    import os, time
+    # if not admin don't do it
+    staffmember = request.user.is_staff
+    if not staffmember:
+        return redirect('/')
+
+    # send the results
+    try:
+        now = time.strftime('%Y-%m-%d-%H-%M-%S')         
+        file_name = "mydb_" + now + ".sql"
+        file_path = settings.DIR_DOWNLOAD_DATA + "mysql/" + file_name
+        
+        os.system("mysqldump -u ecoach -pecoach " + settings.DB_NAME + " > " + file_path)
+
+        fsock = open(file_path,"rb")
+        response = HttpResponse(fsock, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=' + file_name            
+    except IOError:
+        response = HttpResponseNotFound("error creating backup database file")
+
+    return response
+
+

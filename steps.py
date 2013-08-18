@@ -21,7 +21,7 @@ def steps_nav(user, selected):
                         'staff',
                             'select_columns',
             ],
-            ['3. Download File', 
+            ['3. Create File', 
                 '',  
                     reverse('myexporter:download_trigger'),
                         'staff',
@@ -32,6 +32,12 @@ def steps_nav(user, selected):
                     reverse('myexporter:archive'),
                         'staff',
                             'archive',
+            ],
+            ['Dump SQL', 
+                '',  
+                    reverse('myexporter:dump_sql'),
+                        'staff',
+                            'dump_sql',
             ]
         ]
 

@@ -1,0 +1,13 @@
+{% extends 'myexporter/base_exporter.html' %}
+
+{% block status_report %}
+    Click here to <a href={% url "myexporter:download_mysql" %}>download</a> a full sql dump of the database.
+{% endblock %}
+
+
+{% block left_side %}
+{% endblock %}
+
+
+{% block right_side %}
+{% endblock %}

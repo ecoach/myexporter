@@ -118,7 +118,10 @@ def download_trigger_view(request):
             for rr in res:
                 data = []
                 for cc in cols:
-                    data.append(getattr(rr, cc))
+                    val = getattr(rr, cc)
+                    if isinstance(val, unicode):
+                        val = val.encode("ascii", "ignore") 
+                    data.append(val)
                 table.append(data)
             # write the file
             file_path = settings.DIR_DOWNLOAD_DATA + "exports/" + download.file_name

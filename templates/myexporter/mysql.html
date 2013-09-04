@@ -1,7 +1,9 @@
 {% extends 'myexporter/base_exporter.html' %}
 
 {% block status_report %}
-    Click here to <a href={% url "myexporter:download_mysql" %}>download</a> a full sql dump of the database.
+    Click here to <a href={% url "myexporter:download_mysql" %}>download</a> a full sql dump of the coach specific database.
+    <br>
+    Click here to <a href={% url "myexporter:download_common_db" %}>download</a> a full sql dump of the common database.
 {% endblock %}
 
 

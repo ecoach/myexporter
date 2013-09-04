@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^archive/', login_required(archive_view), name='archive'),
     url(r'^dump_sql/', login_required(dump_sql_view), name='dump_sql'),
     url(r'^download_mysql_db/', login_required(Download_Mysql_View), name='download_mysql'),
+    url(r'^download_common_db/', login_required(Download_Common_Db_View), name='download_common_db'),
     url(r'^', login_required(select_table_view), name='default'),
 
     # services

@@ -245,7 +245,7 @@ def Download_Mysql_View(request):
     # send the results
     try:
         now = time.strftime('%Y-%m-%d-%H-%M-%S')         
-        file_name = "mydb_" + now + ".sql"
+        file_name = settings.DB_NAME + "_" + now + ".sql"
         file_path = settings.DIR_DOWNLOAD_DATA + "mysql/" + file_name
         
         os.system("mysqldump -u ecoach -pecoach " + settings.DB_NAME + " > " + file_path)

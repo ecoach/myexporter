@@ -109,7 +109,7 @@ def download_trigger_view(request):
             # Do valid form stuff here
             download.created = datetime.now()
             download.file_name = download.diskname() + ".csv"
-            download.downloaded = False
+            download.downloaded = True
             download.save()
             # create the file
             cols = [ii.column_name for ii in download.download_column_set.all()]
@@ -149,7 +149,11 @@ def download_trigger_view(request):
 def archive_view(request):
     # auto download once, if fail then set to downloaded and redirect back
     download = task_object(request.user)
-    downloads = Download.objects.all().exclude(id=download.id).order_by('-id')
+    all_downs = Download.objects.all().exclude(downloaded=False).order_by('-id')
+    downloads = [] 
+    for dd in all_downs:
+        if len(dd.file_name) > 0:
+            downloads.append(dd) 
     archive_list = []
     for dd in downloads:
         archive_list.append([dd.diskname, dd.id])

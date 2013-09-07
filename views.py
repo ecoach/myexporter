@@ -97,6 +97,7 @@ def select_columns_view(request):
 
 def download_trigger_view(request):
     import csv
+    from django.db import connections, router
     download = task_object(request.user)
     if download.table is None:
         return redirect('myexporter:select_table') 
@@ -114,11 +115,16 @@ def download_trigger_view(request):
             # create the file
             cols = [ii.column_name for ii in download.download_column_set.all()]
             table = []
-            res = eval(download.table).objects.all()
-            for rr in res:
+            # check the routers for their answer on the db
+            db = router.db_for_read(eval(download.table))
+            cursor = connections[db].cursor()
+            col_str = ', '.join([str(x) for x in cols]) 
+            query = "select " + col_str + " from " + eval(download.table)._meta.db_table
+            res = cursor.execute(query)
+            done = cursor.fetchall() 
+            for row in done:
                 data = []
-                for cc in cols:
-                    val = getattr(rr, cc)
+                for val in row:
                     if isinstance(val, unicode):
                         val = val.encode("ascii", "ignore") 
                     data.append(val)

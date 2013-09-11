@@ -15,6 +15,7 @@ class Select_Table_Form(forms.Form):
 
     def table_choices(self):
         available = [
+            ('Message', 'Message'),
             ('ELog', 'ELog'),
             ('Source1', 'Source1'),
             ('Common1', 'Common1')

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils.importlib import import_module
 from django.conf import settings
 from mylogger.models import ELog
+from myemailer.models import Message
 mydata = import_module(settings.MYDATA)
 Source1 = mydata.models.Source1
 Common1 = mydata.models.Common1
@@ -37,7 +38,7 @@ class Download(models.Model):
     def column_choices(self):
         ids = []
         for ff in eval(self.table)._meta.fields:
-            ids.append(ff.name)
+            ids.append(ff.column)
         return zip(ids, ids)
 
 class Download_Column(models.Model):

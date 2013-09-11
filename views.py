@@ -118,8 +118,8 @@ def download_trigger_view(request):
             # check the routers for their answer on the db
             db = router.db_for_read(eval(download.table))
             cursor = connections[db].cursor()
-            col_str = ', '.join([str(x) for x in cols]) 
-            query = "select " + col_str + " from " + eval(download.table)._meta.db_table
+            col_str = '`, `'.join([str(x) for x in cols]) 
+            query = "select `" + col_str + "` from " + eval(download.table)._meta.db_table
             res = cursor.execute(query)
             done = cursor.fetchall() 
             for row in done:

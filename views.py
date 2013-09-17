@@ -119,7 +119,9 @@ def download_trigger_view(request):
             db = router.db_for_read(eval(download.table))
             cursor = connections[db].cursor()
             col_str = '`, `'.join([str(x) for x in cols]) 
-            query = "select `" + col_str + "` from " + eval(download.table)._meta.db_table
+            students = Source1.objects.all().order_by('id').values_list('user_id')
+            where_str = " where user_id='" + "' or user_id='".join([str(x[0]) for x in students]) + "'"
+            query = "select `" + col_str + "` from " + eval(download.table)._meta.db_table + where_str
             res = cursor.execute(query)
             done = cursor.fetchall() 
             for row in done:

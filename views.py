@@ -1,3 +1,4 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
@@ -23,6 +24,7 @@ configure_source_data = myutils.configure_source_data
 
 # Create your views here.
 
+@staff_member_required
 def select_table_view(request):
 
     download = task_object(request.user)
@@ -52,7 +54,7 @@ def select_table_view(request):
         "form": form,
     })
 
-
+@staff_member_required
 def select_columns_view(request):
     download = task_object(request.user)
     if download.table is None:
@@ -95,6 +97,7 @@ def select_columns_view(request):
         "form": form,
     })
 
+@staff_member_required
 def download_trigger_view(request):
     import csv
     from django.db import connections, router
@@ -157,6 +160,7 @@ def download_trigger_view(request):
         "form": form,
     })
 
+@staff_member_required
 def archive_view(request):
     # auto download once, if fail then set to downloaded and redirect back
     download = task_object(request.user)
@@ -199,6 +203,7 @@ def archive_view(request):
         "form": form,
     })
 
+@staff_member_required
 def download_file_view(request, **kwargs):
     # if not admin don't do it
     staffmember = request.user.is_staff
@@ -243,6 +248,7 @@ def new_task(user):
     profile.prefs = prefs
     profile.save()
 
+@staff_member_required
 def dump_sql_view(request):
     return render(request, 'myexporter/mysql.html', {
         "main_nav": main_nav(request.user, 'staff_view'),
@@ -250,6 +256,7 @@ def dump_sql_view(request):
         "steps_nav": steps_nav(request.user, 'dump_sql'),
     })
 
+@staff_member_required
 def Download_Mysql_View(request):
     import os, time
     # if not admin don't do it
@@ -273,6 +280,7 @@ def Download_Mysql_View(request):
 
     return response
 
+@staff_member_required
 def Download_Common_Db_View(request):
     import os, time
     # if not admin don't do it

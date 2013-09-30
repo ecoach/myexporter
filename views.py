@@ -145,7 +145,7 @@ def download_trigger_view(request):
                 for ii in table:
                     csvwriter.writerow(ii)
             # redirect to archive which redirects download the first time
-            new_task(request.user) 
+            #new_task(request.user) 
             return redirect('myexporter:archive')
     else:
         form = Download_File_Form(
@@ -229,13 +229,13 @@ def task_object(user):
     prefs = profile.prefs
     # pull the users stuff
     try:
+        # try and look it up
         download = Download.objects.get(pk=prefs["download_pk"])
+        # make sure it's not 'used'
+        if download.downloaded:
+            download = new_task(user)
     except:  
-        download = Download(user=user)
-        download.save()
-        prefs['download_pk'] = download.id
-        profile.prefs = prefs
-        profile.save()
+        download = new_task(user)
     return download
 
 def new_task(user):
@@ -247,6 +247,7 @@ def new_task(user):
     prefs['download_pk'] = download.id
     profile.prefs = prefs
     profile.save()
+    return download
 
 @staff_member_required
 def dump_sql_view(request):

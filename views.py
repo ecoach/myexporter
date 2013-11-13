@@ -135,6 +135,8 @@ def download_trigger_view(request):
                 for val in row:
                     if isinstance(val, unicode):
                         val = val.encode("ascii", "ignore") 
+                    if isinstance(val, datetime):
+                        val = val.strftime('%s')
                     data.append(val)
                 table.append(data)
             # write the file

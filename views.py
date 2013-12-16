@@ -138,6 +138,7 @@ def download_trigger_view(request):
                     if isinstance(val, datetime):
                         val = val.strftime('%s')
                     data.append(val)
+                data = [ii.replace(",", "") for ii in data]	
                 table.append(data)
             # write the file
             file_path = settings.DIR_DOWNLOAD_DATA + "exports/" + download.file_name

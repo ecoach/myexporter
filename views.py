@@ -137,8 +137,11 @@ def download_trigger_view(request):
                         val = val.encode("ascii", "ignore") 
                     if isinstance(val, datetime):
                         val = val.strftime('%s')
+                    try:
+                        val = val.replace(',','')
+                    except:
+                        pass
                     data.append(val)
-                data = [ii.replace(",", "") for ii in data]	
                 table.append(data)
             # write the file
             file_path = settings.DIR_DOWNLOAD_DATA + "exports/" + download.file_name

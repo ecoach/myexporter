@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response, render, redirect
 from django.conf import settings
 from datetime import datetime
 from mynav.nav import main_nav, tasks_nav
-from myexporter.csvfile import CsvFile, MapFile
+from myloader.csvfile import CsvFile, MapFile
 from .steps import steps_nav
 from .models import *
 from .forms import ( 
